@@ -25,7 +25,14 @@ export default function LandingPage() {
         .select("id, title, description, sort_order")
         .order("sort_order", { ascending: true });
 
-      if (fetchError || !data || data.length === 0) {
+      if (fetchError) {
+        console.error("[Supabase fetch error]", fetchError);
+        setError(true);
+        setLessons(localLessons);
+      } else if (!data || data.length === 0) {
+        console.warn(
+          "[Supabase] lessons table returned empty — using local fallback",
+        );
         setError(true);
         setLessons(localLessons);
       } else {
@@ -40,7 +47,8 @@ export default function LandingPage() {
       }
     }
 
-    fetchLessons().catch(() => {
+    fetchLessons().catch((err) => {
+      console.error("[Supabase network/init error]", err);
       setError(true);
       setLessons(localLessons);
     });
