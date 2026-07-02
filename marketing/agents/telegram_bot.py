@@ -21,6 +21,9 @@ from dotenv import load_dotenv
 ROOT = Path(__file__).resolve().parent.parent.parent  # project root
 load_dotenv(ROOT / ".env")
 
+# Add agents dir to path so we can import second_brain
+sys.path.insert(0, str(ROOT / "marketing" / "agents"))
+
 TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
 OWNER_ID = os.environ.get("MY_TELEGRAM_USER_ID", "").strip()
 
@@ -270,6 +273,17 @@ async def cmd_report_now(update, _context):
     await _generate_and_send_report(update)
 
 
+async def cmd_brain(update, _context):
+    """Show the Second Brain summary — report, top successes, top failures."""
+    try:
+        from second_brain import get_brain_summary
+
+        summary = get_brain_summary()
+    except Exception as e:
+        summary = f"❌ Could not read Brain: {e}"
+    await update.message.reply_text(summary, parse_mode="Markdown")
+
+
 # ═══════════════════════════════════════════════════════════════════════
 #  Shared logic
 # ═══════════════════════════════════════════════════════════════════════
@@ -386,6 +400,7 @@ def _build_app():
     app.add_handler(
         CommandHandler("report_now", lambda u, c: gate(cmd_report_now, u, c))
     )
+    app.add_handler(CommandHandler("brain", lambda u, c: gate(cmd_brain, u, c)))
 
     # Any non-command message → access denied for non-owner, or help for owner
     async def handle_message(update: Update, _context):
@@ -397,6 +412,7 @@ def _build_app():
                 "/run — run full pipeline\n"
                 "/post [text] — publish to channel\n"
                 "/post_now [text] — emergency publish\n"
+                "/brain — second brain history\n"
                 "/report — weekly report\n"
                 "/report_now — report immediately",
                 parse_mode="Markdown",
@@ -413,7 +429,9 @@ def main():
     print("══════════════════════════════════════════════")
     print("  🤖  Novicado Marketing Team Bot")
     print(f"  Owner ID: {OWNER_ID_INT}")
-    print(f"  Commands: /status /content /run /post /post_now /report /report_now")
+    print(
+        f"  Commands: /status /content /run /post /post_now /brain /report /report_now"
+    )
     print("══════════════════════════════════════════════\n")
 
     app = _build_app()
