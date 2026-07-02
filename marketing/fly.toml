@@ -1,0 +1,16 @@
+app = "novicado-marketing"
+primary_region = "cdg"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"
+
+[mounts]
+  source = "brain_data"
+  destination = "/data"
+
+[env]
+  BRAIN_PATH = "/data/brain"

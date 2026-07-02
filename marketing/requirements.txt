@@ -1,0 +1,6 @@
+openai
+python-dotenv
+python-telegram-bot[job-queue]
+schedule
+Pillow
+requests
