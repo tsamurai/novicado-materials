@@ -7,10 +7,12 @@ Generates a one-month marketing strategy using DeepSeek API.
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
 from openai import OpenAI
 
-# ── Paths ──────────────────────────────────────────────────────────────
+# ── Load .env from project root (regardless of current working directory) ─
 ROOT = Path(__file__).resolve().parent.parent.parent  # project root
+load_dotenv(ROOT / ".env")
 STRATEGY_PATH = ROOT / "marketing" / "PRODUCT_STRATEGY.md"
 OUTPUT_PATH = ROOT / "marketing" / "MARKETING_PLAN.md"
 
